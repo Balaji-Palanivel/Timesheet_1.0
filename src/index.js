@@ -1,11 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import App from "./App";
+
 import reportWebVitals from "./reportWebVitals";
 import Timesheet from "./Timesheet";
 import SignUp from "./SignUp";
 import Login from "./Login";
+import Export from "./Export"
+import Settings from "./Settings"
 import {
   BrowserRouter,
   Routes,
@@ -15,10 +17,12 @@ import {
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter >
-      <Routes>
+    <Routes>
       <Route path="/" element={<Login />} />
       <Route path="signup" element={<SignUp />} />
       <Route path="/timesheet" element={<Timesheet />} />
+      <Route path="/export" element={<Export />} />
+      <Route path="/settings" element={<Settings />} />
     </Routes>
   </BrowserRouter >
 );

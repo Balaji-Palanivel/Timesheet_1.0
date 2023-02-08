@@ -1,9 +1,17 @@
+
+@media screen and (max-width: 700px) {
+  .vl{
+    display: none;
+  }
+}
+
 .active_1:hover {
   text-decoration: underline;
 }
 
 .search {
-  border: 1px solid rgb(131, 93, 238);
+  border: 2px solid rgb(139, 169, 240);
+  border-radius: 7px;
 }
 
 .form-container {
@@ -12,7 +20,11 @@
   align-items: center;
 }
 
+.vl {
+  border-left: 2px solid rgb(114, 114, 118);
+  height: 250px;
 
+}
 
 .yhu{
   display: flex;
