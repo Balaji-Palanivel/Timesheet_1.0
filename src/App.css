@@ -1,12 +1,24 @@
 
-@media screen and (max-width: 700px) {
-  .vl{
+
+@media screen and (max-width: 1000px) {
+  div.vl{
     display: none;
   }
-}
 
+  div.pad{
+    margin-top: 50px;
+    margin-left: 140px;
+  }
+}
+.active_1{
+  
+  color: white;
+}
 .active_1:hover {
-  text-decoration: underline;
+ background-color: #F9F7F7;
+ border-radius: 10px;
+color: black;
+opacity: 50%;
 }
 
 .search {
@@ -22,9 +34,10 @@
 
 .vl {
   border-left: 2px solid rgb(114, 114, 118);
-  height: 250px;
-
+  height: 220px;
 }
+
+
 
 .yhu{
   display: flex;

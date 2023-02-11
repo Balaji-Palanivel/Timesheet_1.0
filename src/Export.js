@@ -13,7 +13,10 @@ class Export extends React.Component {
     render() {
         return (
             <div>
+
                 <Navbar />
+
+
                 <div className="p-4">
                     <div
                         className="card bg-light container shadow p-3 mb-5 bg-white rounded "
@@ -94,10 +97,11 @@ class Export extends React.Component {
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-1 d-flex align-items-center justify-content-center vl"></div>
-                                <div className="col-lg-3 d-flex align-items-center justify-content-center">
+                                <div className="col-lg-1 vl g-4"></div>
+                                <div className="col-lg-3 d-flex align-items-center justify-content-center pad" style={{ paddingInlineStart: "5%" }}>
                                     <div><FontAwesomeIcon icon={icon.faFileExport} style={{ width: "40%", height: "40%" }} />
-                                        <p className="fs-5 ">Export Here..</p></div>
+                                        <p className="fs-5 " > &nbsp; Export </p></div>
+
 
                                 </div>
 
@@ -119,7 +123,7 @@ class Export extends React.Component {
                             <div className="row flex-wrap">
                                 <div className="col-lg ">
                                     <div className="row ">
-                                        <div className="col-2 pt-4">
+                                        <div className="col-sm-2 pt-4">
                                             <FontAwesomeIcon icon={icon.faFile} style={{ width: "40%", height: "40%" }} />
                                             <p className="fs-6">May 2023</p>
                                         </div>

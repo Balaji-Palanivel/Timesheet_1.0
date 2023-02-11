@@ -3,8 +3,10 @@ import "./App.css";
 import React from "react";
 import $ from "jquery";
 import Navbar from "./Navbar";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import * as icon from "@fortawesome/free-solid-svg-icons";
 
-class Timesheet extends React.Component {
+class TSA_Timesheet extends React.Component {
   constructor() {
     super();
   }
@@ -76,124 +78,12 @@ class Timesheet extends React.Component {
           </div>
         </nav> */}
 
-        {/*------------------------------------------------------- Card ------------------------------------------------------------ */}
 
-        <div className="p-4">
-          <div
-            className="card bg-light container shadow bg-white rounded"
-            style={{ width: "100%", height: "100%", backgroundColor: "#F9F7F7" }}
-          >
-            <div className="card-body ">
-              <div className="row pt-4 g-2">
-                <div class="col-sm input-group flex-nowrap">
-                  <span
-                    for="validationDefaultUsername"
-                    class="input-group-text"
-                    id="addon-wrapping"
-                  >
-                    Name
-                  </span>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="form4Example2"
-                    aria-label="Username"
-                    aria-describedby="addon-wrapping"
-                  />
-                </div>
-                <div class="col-sm input-group flex-nowrap">
-                  <span
-                    for="validationDefaultUsername"
-                    class="input-group-text"
-                    id="addon-wrapping"
-                  >
-                    Employee ID
-                  </span>
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="form4Example2"
-                    aria-label="Username"
-                    aria-describedby="addon-wrapping"
-                  />
-                </div>
-              </div>
-              <div className="row pt-4 g-2">
-                <div class="col-sm input-group flex-nowrap">
-                  <span
-                    for="validationDefaultUsername"
-                    class="input-group-text"
-                    id="addon-wrapping"
-                  >
-                    Project Name
-                  </span>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="form4Example2"
-                    aria-label="Username"
-                    aria-describedby="addon-wrapping"
-                  />
-                </div>
-                <div class="col-sm input-group flex-nowrap">
-                  <span
-                    for="validationDefaultUsername"
-                    class="input-group-text"
-                    id="addon-wrapping"
-                  >
-                    Project ID
-                  </span>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="form4Example2"
-                    aria-label="Username"
-                    aria-describedby="addon-wrapping"
-                  />
-                </div>
-              </div>
-              <div className="row pt-4 g-2">
-                <div class="col-sm input-group flex-nowrap">
-                  <span
-                    for="validationDefaultUsername"
-                    class="input-group-text"
-                    id="addon-wrapping"
-                  >
-                    Date Of Joining
-                  </span>
-                  <input
-                    type="date"
-                    class="form-control"
-                    id="form4Example2"
-                    aria-label="Username"
-                    aria-describedby="addon-wrapping"
-                  />
-                </div>
-                <div class="col-sm input-group flex-nowrap pb-4">
-                  <span
-                    for="validationDefaultUsername"
-                    class="input-group-text"
-                    id="addon-wrapping"
-                  >
-                    Email
-                  </span>
-                  <input
-                    type="email"
-                    class="form-control"
-                    id="form4Example2"
-                    aria-label="Username"
-                    aria-describedby="addon-wrapping"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
         {/*---------------------------------------------------Searchbox/new Timesheet ------------------------------------------------*/}
 
         <div className="container">
-          <div className="row">
-            <div className="col-3 pt-5">
+          <div className="row justify-content-between">
+            <div className="col-lg-3 pt-5">
               <div className="form-group mb-3 search">
                 <input
                   type="text"
@@ -202,31 +92,24 @@ class Timesheet extends React.Component {
                 />
               </div>
             </div>
-            <div className="col pt-5" align="right">
-              <button
-                type="button"
-                class="btn btn-success"
-                data-bs-toggle="modal"
-                data-bs-target="#staticBackdrop1"
-              >
-                BackUp
-              </button>
-              <span> </span>
-              <button
-                type="button"
-                class="btn btn-primary"
-                data-bs-toggle="modal"
-                data-bs-target="#staticBackdrop"
-              >
-                New Timesheet
-              </button>
+            <div className="col-lg-2 pt-5" align="right">
+              <div class="dropdown">
+                <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                  All
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                  <li><a class="dropdown-item" href="#">Approved</a></li>
+                  <li><a class="dropdown-item" href="#">Rejected</a></li>
+                  <li><a class="dropdown-item" href="#">Not Viewed</a></li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
 
         {/*---------------------------------------------------------- Table ----------------------------------------------------------*/}
 
-        <div className="container pt-4 pb-4 shadow" style={{ backgroundColor: "#F9F7F7", borderRadius: "10px" }}>
+        <div className="container pt-4 pb-4 shadow">
           <div style={{ height: "auto", maxHeight: "500px", overflow: "auto" }}>
             <table class="table table-striped bg-white rounded" >
               <thead
@@ -235,54 +118,44 @@ class Timesheet extends React.Component {
               >
                 <tr>
                   <th scope="col">S.no</th>
-                  <th scope="col">Attendance</th>
-                  <th scope="col">Date</th>
-                  <th scope="col">Activity Performed/ Tasks</th>
-                  <th scope="col">No.Of Hours</th>
+                  <th scope="col">Project</th>
+                  <th scope="col">Emp.ID</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Month</th>
+                  <th scope="col">Status</th>
                 </tr>
               </thead>
               <tbody style={{ fontSize: "17px" }}>
                 <tr>
                   <td>1</td>
-                  <td>Present</td>
-                  <td>01/01/2023</td>
-                  <td>Learned Python Basics</td>
-                  <td>9:00</td>
+                  <td>Commscope</td>
+                  <td>7701</td>
+                  <td>Ganabahathi.P</td>
+                  <td>January 2023</td>
+                  <td>Not Viewed</td>
                 </tr>
 
                 <tr>
                   <td>2</td>
-                  <td>Absent</td>
-                  <td>02/01/2023</td>
-                  <td>Learned MongoDB Basics</td>
-                  <td>8:30</td>
+                  <td>Nexla</td>
+                  <td>7702</td>
+                  <td>Murugan.P</td>
+                  <td>January 2023</td>
+                  <td>Approved</td>
                 </tr>
                 <tr>
                   <td>3</td>
-                  <td>Present</td>
-                  <td>03/01/2023</td>
-                  <td>Learned MongoDB Basics</td>
-                  <td>9:00</td>
+                  <td>Commscope</td>
+                  <td>7703</td>
+                  <td>Manikandan.P</td>
+                  <td>January 2023</td>
+                  <td>Approved</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
 
-        {/*---------------------------------------------------- Submit for approval ----------------------------------------------------*/}
-
-        <div className="container">
-          <div className="pb-5 pt-4" align="right">
-            <button
-              type="button"
-              class="btn btn-danger "
-              data-bs-toggle="modal"
-              data-bs-target="#staticBackdrop2"
-            >
-              Submit For Approval
-            </button>
-          </div>
-        </div>
 
         {/*---------------------------------------------------- Modal for Add new timesheet ----------------------------------------------------*/}
 
@@ -322,7 +195,6 @@ class Timesheet extends React.Component {
                     type="text"
                     id="reportrange"
                     name="datefilter"
-                    className="form-control"
 
                   />
                 </div>
@@ -338,7 +210,7 @@ class Timesheet extends React.Component {
                       </label>
                     </div>
                     <select
-                      class="custom-select col-8 form-control"
+                      class="custom-select col-8"
                       id="inputGroupSelect01"
                       style={{ backgroundColor: "white" }}
                     >
@@ -542,4 +414,4 @@ class Timesheet extends React.Component {
     );
   }
 }
-export default Timesheet;
+export default TSA_Timesheet;

@@ -8,6 +8,9 @@ import SignUp from "./SignUp";
 import Login from "./Login";
 import Export from "./Export"
 import Settings from "./Settings"
+import TSA_Timesheet from "./TSA_Timesheet";
+import TSA_View_Timesheet from "./TSA_View_Timesheet";
+
 import {
   BrowserRouter,
   Routes,
@@ -18,7 +21,7 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter >
     <Routes>
-      <Route path="/" element={<Login />} />
+      <Route path="/" element={<TSA_View_Timesheet />} />
       <Route path="signup" element={<SignUp />} />
       <Route path="/timesheet" element={<Timesheet />} />
       <Route path="/export" element={<Export />} />
