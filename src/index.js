@@ -21,11 +21,12 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter >
     <Routes>
-      <Route path="/" element={<TSA_View_Timesheet />} />
+      <Route path="/" element={<Login />} />
       <Route path="signup" element={<SignUp />} />
       <Route path="/timesheet" element={<Timesheet />} />
       <Route path="/export" element={<Export />} />
-      <Route path="/settings" element={<Settings />} />
+      <Route path="/tsa_timesheet" element={<TSA_Timesheet />} />
+      <Route path="/tsa_view_timesheet" element={<TSA_View_Timesheet />} />
     </Routes>
   </BrowserRouter >
 );

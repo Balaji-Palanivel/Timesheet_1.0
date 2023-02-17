@@ -1,7 +1,5 @@
-import logo from "./logo.svg";
 import "./App.css";
 import React from "react";
-import $ from "jquery";
 import Navbar from "./Navbar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as icon from "@fortawesome/free-solid-svg-icons";
@@ -13,9 +11,7 @@ class Export extends React.Component {
     render() {
         return (
             <div>
-
                 <Navbar />
-
 
                 <div className="p-4">
                     <div

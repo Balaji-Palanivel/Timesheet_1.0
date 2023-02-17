@@ -1,10 +1,6 @@
-import logo from "./logo.svg";
 import "./App.css";
 import React from "react";
-import $ from "jquery";
 import Navbar from "./Navbar";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import * as icon from "@fortawesome/free-solid-svg-icons";
 
 class TSA_View_Timesheet extends React.Component {
     constructor() {
@@ -16,7 +12,7 @@ class TSA_View_Timesheet extends React.Component {
                 <div>
                     <Navbar />
                 </div>
-                <div className="container px-4">
+                <div className="container p-4">
                     <div className="row gy-4">
                         <div className="col-lg-3">
                             <div className="card d-flex flex-wrap" style={{ flexDirection: "row", height: "120px" }}>

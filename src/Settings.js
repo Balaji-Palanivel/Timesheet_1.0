@@ -1,7 +1,6 @@
-import logo from "./logo.svg";
+/*eslint-disable*/
 import "./App.css";
 import React from "react";
-import $ from "jquery";
 import Navbar from "./Navbar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as icon from "@fortawesome/free-solid-svg-icons";
@@ -14,7 +13,6 @@ class Settings extends React.Component {
         return (
             <div>
                 <Navbar />
-
                 <div className="p-4 ">
                     <div
                         className="card bg-light container shadow p-3 mb-5 bg-white rounded"
@@ -31,7 +29,6 @@ class Settings extends React.Component {
                                         height="200"
                                         style={{ borderRadius: "25px" }}
                                     />
-
                                 </div>
                                 <div className="col-lg-2 g-4 py-4 text-center" >
 
@@ -42,8 +39,6 @@ class Settings extends React.Component {
                                             <li className="px-2 ">Select New Photo</li>
                                         </ul>
                                     </div>
-
-
                                     <div><button className="btn btn-info my-4" ><FontAwesomeIcon icon={icon.faTrash} /> &nbsp; Delete</button></div>
                                 </div>
                             </div>
