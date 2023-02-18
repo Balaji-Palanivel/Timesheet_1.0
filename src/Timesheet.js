@@ -15,13 +15,12 @@ class Timesheet extends React.Component {
       emp_project_id: "",
       date_of_joining: "",
       New_date: [],
+      bacup_date: [],
       New_attendance: "",
       New_startTime: "",
       New_endTime: "",
-      New_activity: ""
-
-
-
+      New_activity: "",
+      Added_Timesheet: []
     }
     this.Add_NewTimeSheet = this.Add_NewTimeSheet.bind(this)
   }
@@ -30,39 +29,39 @@ class Timesheet extends React.Component {
       .then((response) => response.json())
       .then((data) =>
         this.setState({
-          emp_name: data.emp_name,
-          emp_id: data.emp_id,
-          emp_email: data.emp_mail,
-          date_of_joining: data.date_of_joining,
-          emp_project: data.emp_project,
-          emp_project_id: data.emp_project_id
+          emp_name: data.emp_data.emp_name,
+          emp_id: data.emp_data.emp_id,
+          emp_email: data.emp_data.emp_mail,
+          date_of_joining: data.emp_data.date_of_joining,
+          emp_project: data.emp_data.emp_project,
+          emp_project_id: data.emp_data.emp_project_id,
+          Added_Timesheet: data.timesheet
         })
 
       );
   }
+
+  //* --------------------------------------------------------------------------------------- *//
+
+  getDates(startDate, stopDate) {
+    let s = new Date(startDate).getDate()
+    let e = new Date(stopDate).getDate()
+    var dateArray = new Array();
+    var currentDate = new Date(startDate);
+    for (var i = 0; i <= e - s; i++) {
+      dateArray.push(moment(currentDate).format("DD/MM/YYYY"));
+      currentDate.setDate(new Date(currentDate).getDate() + 1);
+    }
+
+    (startDate == stopDate) ? this.setState({ New_date: [startDate] }) : this.setState({ New_date: dateArray, bacup_date: dateArray })
+  }
+
+  //* --------------------------------------------------------------------------------------- *//
+
   Add_NewTimeSheet = async () => {
 
     var [startDate, stopDate] = await document.getElementById("reportrange").value.split(" - ");
-    if (startDate == stopDate) {
-      var datelist = getDates(startDate, stopDate);
-      function getDates(startDate, stopDate) {
-        let s = new Date(startDate).getDate()
-        let e = new Date(stopDate).getDate()
-        var dateArray = new Array();
-        var currentDate = new Date(startDate);
-        for (var i = 0; i <= e - s; i++) {
-          dateArray.push(moment(currentDate).format("DD/MM/YYYY"));
-          currentDate.setDate(new Date(currentDate).getDate() + 1);
-        }
-        return dateArray
-      }
-      this.setState({ New_date: datelist })
-    }
-    else {
-      this.setState({ New_date: startDate })
-
-    }
-
+    var datelist = await this.getDates(startDate, stopDate);
     const response = await fetch('http://localhost:5000/timesheet', {
       method: 'POST',
       headers: {
@@ -77,9 +76,42 @@ class Timesheet extends React.Component {
       })
     });
     const result = await response.json();
-    console.log(result)
-
+    this.setState({ Added_Timesheet: result })
   }
+
+  //* --------------------------------------------------------------------------------------- *//
+
+  back_up = async () => {
+    var [startDate, stopDate] = await document.getElementById("backup_date").value.split(" - ");
+    var datelist = await this.getDates(startDate, stopDate);
+    const response = await fetch('http://localhost:5000/timesheet', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        "Backup_dates": this.state.bacup_date
+      })
+    });
+    const result = await response.json();
+    console.log(result, "backup's")
+  }
+  // this.setState({ Added_Timesheet: result })
+
+  //* --------------------------------------------------------------------------------------- *//
+
+  calculateHours(startTime, endTime) {
+    var end = (parseInt(endTime.split(':')[0]) + 12).toString() + ":" + (endTime.split(':')[1]).toString()
+    var start = new Date("1970-01-01T" + startTime + ":00Z");
+    var end = new Date("1970-01-01T" + end + ":00Z");
+    var diff = (end.getTime() + 12) - start.getTime();
+    var hours = Math.floor(diff / (1000 * 60 * 60));
+    var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    return hours.toString().padStart(2, "0") + ":" + minutes.toString().padStart(2, "0");
+  }
+
+  //* --------------------------------------------------------------------------------------- *//
+
   render() {
 
     return (
@@ -88,8 +120,7 @@ class Timesheet extends React.Component {
           <Navbar />
         </div>
 
-        {/*------------------------------------------------------- Card ------------------------------------------------------------ */}
-
+        {/*------------------------------------------------------- Card --------------------------------------------------------- */}
         <div className="p-4">
           <div
             className="card container shadow bg-white rounded"
@@ -219,8 +250,7 @@ class Timesheet extends React.Component {
             </div>
           </div>
         </div>
-        {/*---------------------------------------------------Searchbox/new Timesheet/BackUp --------------------------------------*/}
-
+        {/*---------------------------------------------------Searchbox/new Timesheet/BackUp -------------------------------------*/}
         <div className="container">
           <div className="row">
             <div className="col-3 pt-5">
@@ -249,14 +279,14 @@ class Timesheet extends React.Component {
                 class="btn btn-primary"
                 data-bs-toggle="modal"
                 data-bs-target="#staticBackdrop"
+
               >
                 New Timesheet
               </button>
             </div>
           </div>
         </div>
-
-        {/*---------------------------------------------------------- Table ----------------------------------------------------------*/}
+        {/*---------------------------------------------------------- Table ------------------------------------------------------*/}
 
         <div className="container pt-4 pb-4 shadow" style={{ backgroundColor: "#F9F7F7", borderRadius: "10px" }}>
           <div style={{ height: "auto", maxHeight: "500px", overflow: "auto" }}>
@@ -274,20 +304,20 @@ class Timesheet extends React.Component {
                 </tr>
               </thead>
               <tbody style={{ fontSize: "17px" }}>
-                <tr>
-                  <td>1</td>
-                  <td>Present</td>
-                  <td>01/01/2023</td>
-                  <td>Learned Python Basics</td>
-                  <td>9:00</td>
-                </tr>
-
+                {this.state.Added_Timesheet ? this.state.Added_Timesheet.map((value, index) =>
+                  <tr key={index}>
+                    <th scope="col">{index + 1}</th>
+                    <th scope="col">{value.Attendance}</th>
+                    <th scope="col">{value.date}</th>
+                    <th scope="col">{value.Activity}</th>
+                    <th scope="col">{this.calculateHours(value.StartTime, value.Stoptime)}</th>
+                  </tr>) : ""}
               </tbody>
             </table>
           </div>
         </div>
 
-        {/*---------------------------------------------------- Submit for approval ----------------------------------------------------*/}
+        {/*---------------------------------------------------- Submit for approval -----------------------------------------------*/}
 
         <div className="container">
           <div className="pb-5 pt-4" align="right">
@@ -302,7 +332,7 @@ class Timesheet extends React.Component {
           </div>
         </div>
 
-        {/*---------------------------------------------------- Modal for Add new timesheet ----------------------------------------------------*/}
+        {/*---------------------------------------------------- Modal for Add new timesheet ---------------------------------------*/}
 
         <div
           class="modal fade"
@@ -378,6 +408,7 @@ class Timesheet extends React.Component {
                     </div>
                     <input
                       type="time"
+
                       class="form-control"
                       aria-label="Username"
                       aria-describedby="basic-addon1"
@@ -390,6 +421,7 @@ class Timesheet extends React.Component {
                     </div>
                     <input
                       type="time"
+
                       class="form-control"
                       aria-label="Username"
                       aria-describedby="basic-addon1"
@@ -423,7 +455,7 @@ class Timesheet extends React.Component {
           </div>
         </div>
 
-        {/*---------------------------------------------------- Modal for Backup new timesheet ----------------------------------------------------*/}
+        {/*---------------------------------------------------- Modal for Backup new timesheet -----------------------------------*/}
 
         <div
           class="modal fade"
@@ -459,7 +491,8 @@ class Timesheet extends React.Component {
                   </span>
                   <input
                     type="text"
-                    id="reportrange"
+                    className="form-control"
+                    id="backup_date"
                     name="datefilter"
                     value=""
                   />
@@ -473,7 +506,7 @@ class Timesheet extends React.Component {
                   >
                     Month
                   </span>
-                  <input type="month" />
+                  <input type="month" className="form-control" />
                 </div>
               </div>
               <div class="modal-footer">
@@ -484,14 +517,14 @@ class Timesheet extends React.Component {
                 >
                   Close
                 </button>
-                <button type="button" class="btn btn-primary">
+                <button type="button" class="btn btn-primary" onClick={this.back_up}>
                   Add
                 </button>
               </div>
             </div>
           </div>
         </div>
-        {/*---------------------------------------------------- Modal for Submit for approval ----------------------------------------------------*/}
+        {/*---------------------------------------------------- Modal for Submit for approval --------------------------------------*/}
 
         <div
           class="modal fade"

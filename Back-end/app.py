@@ -1,7 +1,8 @@
 from pymongo import MongoClient
 from flask import Flask,g
 from flask import jsonify,request
-from bson.json_util import dumps, loads
+
+from bson.json_util import dumps
 import json
 app = Flask(__name__)
 
@@ -39,20 +40,33 @@ def login():
 def timesheet():       
     
     if request.method == 'GET':
-        return json.loads(dumps(Emp_Data))
+        result = list(db[Login_id].find())        
+        a =  json.loads(dumps(result))
+        b = json.loads(dumps(Emp_Data))
+        return jsonify({'emp_data': b , "timesheet" : a})
     if request.method == 'POST':
         dates = request.get_json().get('dates')
-        attendance = request.get_json().get('Attandence')
+        print(dates)
+        attendance = request.get_json().get('Attendance')
         Start = request.get_json().get('startTime')
         End = request.get_json().get('endTime')
         activitiy = request.get_json().get('Activity')
-        db[Login_id].insert_one({"date":dates , "Attendance" : attendance, "StartTime" : Start , "Stoptime" : End , "Activity" : activitiy})
-        return db[Login_id].find()
+        for date in dates:
+            db[Login_id].insert_one({"date":date , "Attendance" : attendance, "StartTime" : Start , "Stoptime" : End , "Activity" : activitiy})
+        result = list(db[Login_id].find())        
+        return json.loads(dumps(result))
+    if request.method == 'DELETE':
+        Backupdates = request.get_json().get('Backup_dates')
+        print(Backupdates)
+        for date in Backupdates:
+            db[Login_id].delete_one({"date":date })
+        result = list(db[Login_id].find())        
+        return json.loads(dumps(result))
+        
+
       
 
 
-       
-    
 
 if __name__ == "__main__":
     app.run(port = 5000, debug = True) 
