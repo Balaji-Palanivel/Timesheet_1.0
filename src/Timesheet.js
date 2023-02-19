@@ -15,7 +15,7 @@ class Timesheet extends React.Component {
       emp_project_id: "",
       date_of_joining: "",
       New_date: [],
-      bacup_date: [],
+      backup_date: [],
       New_attendance: "",
       New_startTime: "",
       New_endTime: "",
@@ -53,7 +53,7 @@ class Timesheet extends React.Component {
       currentDate.setDate(new Date(currentDate).getDate() + 1);
     }
 
-    (startDate == stopDate) ? this.setState({ New_date: [startDate] }) : this.setState({ New_date: dateArray, bacup_date: dateArray })
+    (startDate == stopDate) ? this.setState({ New_date: [startDate] }) : this.setState({ New_date: dateArray, backup_date: dateArray })
   }
 
   //* --------------------------------------------------------------------------------------- *//
@@ -72,31 +72,42 @@ class Timesheet extends React.Component {
         "Attendance": this.state.New_attendance,
         "startTime": this.state.New_startTime,
         "endTime": this.state.New_endTime,
-        "Activity": this.state.New_activity
+        "Activity": this.state.New_activity,
+        "For": "addTimeSheet"
       })
     });
     const result = await response.json();
+
     this.setState({ Added_Timesheet: result })
   }
 
   //* --------------------------------------------------------------------------------------- *//
 
   back_up = async () => {
-    var [startDate, stopDate] = await document.getElementById("backup_date").value.split(" - ");
-    var datelist = await this.getDates(startDate, stopDate);
+    console.log("bacuuukkkkupppp")
+    var [start, stop] = await document.getElementById("backup_date").value.split(" - ");
+    var month = await document.getElementById("backup_month").value;
+    var date = new Date(month);
+    var month1 = date.toLocaleString('default', { month: 'long' }) + "-" + date.getFullYear()
+
+    var datelist = await this.getDates(start, stop);
     const response = await fetch('http://localhost:5000/timesheet', {
-      method: 'DELETE',
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        "Backup_dates": this.state.bacup_date
+        "Backup_dates": this.state.backup_date,
+        "Backup_month": month1,
+        "For": "backup"
       })
     });
     const result = await response.json();
-    console.log(result, "backup's")
+
+
+    await this.setState({ Added_Timesheet: result })
   }
-  // this.setState({ Added_Timesheet: result })
+
 
   //* --------------------------------------------------------------------------------------- *//
 
@@ -107,7 +118,8 @@ class Timesheet extends React.Component {
     var diff = (end.getTime() + 12) - start.getTime();
     var hours = Math.floor(diff / (1000 * 60 * 60));
     var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    return hours.toString().padStart(2, "0") + ":" + minutes.toString().padStart(2, "0");
+    var h = (parseInt(hours.toString().padStart(2, "0")) > 12) ? parseInt(hours.toString().padStart(2, "0")) - 12 : parseInt(hours.toString().padStart(2, "0"))
+    return h + ":" + minutes.toString().padStart(2, "0");
   }
 
   //* --------------------------------------------------------------------------------------- *//
@@ -506,7 +518,7 @@ class Timesheet extends React.Component {
                   >
                     Month
                   </span>
-                  <input type="month" className="form-control" />
+                  <input type="month" className="form-control" id="backup_month" />
                 </div>
               </div>
               <div class="modal-footer">
@@ -518,7 +530,7 @@ class Timesheet extends React.Component {
                   Close
                 </button>
                 <button type="button" class="btn btn-primary" onClick={this.back_up}>
-                  Add
+                  BackUp
                 </button>
               </div>
             </div>
