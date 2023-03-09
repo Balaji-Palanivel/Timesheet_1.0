@@ -3,6 +3,10 @@ import "./App.css";
 import React, { useState } from "react";
 import Navbar from "./Navbar";
 import moment from "moment";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import * as icon from "@fortawesome/free-solid-svg-icons";
+import "@fortawesome/fontawesome-svg-core/styles.css";
+import { ToastContainer, toast } from 'react-toastify';
 
 class Timesheet extends React.Component {
   constructor(props) {
@@ -16,6 +20,7 @@ class Timesheet extends React.Component {
       date_of_joining: "",
       New_date: [],
       backup_date: [],
+      submit_date: [],
       New_attendance: "",
       New_startTime: "",
       New_endTime: "",
@@ -24,7 +29,7 @@ class Timesheet extends React.Component {
     }
     this.Add_NewTimeSheet = this.Add_NewTimeSheet.bind(this)
   }
-  componentWillMount() {
+  componentDidMount() {
     fetch('http://localhost:5000/timesheet')
       .then((response) => response.json())
       .then((data) =>
@@ -48,12 +53,13 @@ class Timesheet extends React.Component {
     let e = new Date(stopDate).getDate()
     var dateArray = new Array();
     var currentDate = new Date(startDate);
+    var sd = moment(currentDate).format("DD/MM/YYYY")
     for (var i = 0; i <= e - s; i++) {
       dateArray.push(moment(currentDate).format("DD/MM/YYYY"));
       currentDate.setDate(new Date(currentDate).getDate() + 1);
     }
 
-    (startDate == stopDate) ? this.setState({ New_date: [startDate] }) : this.setState({ New_date: dateArray, backup_date: dateArray })
+    (startDate == stopDate) ? this.setState({ New_date: [sd] }) : this.setState({ New_date: dateArray })
   }
 
   //* --------------------------------------------------------------------------------------- *//
@@ -62,6 +68,7 @@ class Timesheet extends React.Component {
 
     var [startDate, stopDate] = await document.getElementById("reportrange").value.split(" - ");
     var datelist = await this.getDates(startDate, stopDate);
+
     const response = await fetch('http://localhost:5000/timesheet', {
       method: 'POST',
       headers: {
@@ -73,24 +80,40 @@ class Timesheet extends React.Component {
         "startTime": this.state.New_startTime,
         "endTime": this.state.New_endTime,
         "Activity": this.state.New_activity,
+        "No.Of hours": this.calculateHours(this.state.New_startTime, this.state.New_endTime),
         "For": "addTimeSheet"
       })
     });
     const result = await response.json();
 
     this.setState({ Added_Timesheet: result })
+    await toast.success("Added Successfullly..")
   }
 
   //* --------------------------------------------------------------------------------------- *//
+  getDaysInMonth(month, year, For) {
+    console.log(month, year)
+    var date = new Date(year, month, 1);
+    var days = [];
+    while (date.getMonth() === month) {
+      console.log(date.getMonth())
+      var _Date = new Date(date)
+      days.push(moment(_Date).format("DD/MM/YYYY"));;
+      date.setDate(date.getDate() + 1);
+    }
+    console.log(days)
+    For == "backup" ? this.setState({ backup_date: days }) : this.setState({ submit_date: days })
+  }
+
 
   back_up = async () => {
-    console.log("bacuuukkkkupppp")
-    var [start, stop] = await document.getElementById("backup_date").value.split(" - ");
-    var month = await document.getElementById("backup_month").value;
-    var date = new Date(month);
-    var month1 = date.toLocaleString('default', { month: 'long' }) + "-" + date.getFullYear()
 
-    var datelist = await this.getDates(start, stop);
+    var month = await document.getElementById("backup_month").value;
+    var [_year, _month] = await document.getElementById("backup_month").value.split('-')
+    var date = new Date(month);
+    var month1 = await date.toLocaleString('default', { month: 'long' }) + "-" + date.getFullYear()
+
+    var datelist = await this.getDaysInMonth((_month - 1), _year, "backup");
     const response = await fetch('http://localhost:5000/timesheet', {
       method: 'POST',
       headers: {
@@ -104,33 +127,95 @@ class Timesheet extends React.Component {
     });
     const result = await response.json();
 
-
     await this.setState({ Added_Timesheet: result })
-  }
+    await toast.success("Backup Success")
 
+  }
+  //* --------------------------------------------------------------------------------------- *//
+  submit_for_approval = async () => {
+    var month = await document.getElementById("submit_month").value;
+    var [_year, _month] = await document.getElementById("submit_month").value.split('-')
+    var date = new Date(month);
+    var month1 = await date.toLocaleString('default', { month: 'long' }) + "-" + date.getFullYear()
+
+    var datelist = await this.getDaysInMonth((_month - 1), _year, "submit");
+    const response = await fetch('http://localhost:5000/timesheet', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        "Submit_dates": this.state.submit_date,
+        "Submit_month": month1,
+        "For": "submit"
+      })
+    });
+
+    await toast.success("Submit Successfully...")
+
+  }
 
   //* --------------------------------------------------------------------------------------- *//
 
+  search = async (e) => {
+    const response = await fetch('http://localhost:5000/timesheet', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        "search_element": e,
+        "For": "search"
+      })
+    });
+    const result = await response.json();
+    await this.setState({ Added_Timesheet: result })
+  }
+
+  //* --------------------------------------------------------------------------------------- *//
+
+  filterBy = async (e) => {
+    document.getElementById('filter_id').innerText = e
+    const response = await fetch('http://localhost:5000/timesheet', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        "filter_element": e,
+        "For": "filter"
+      })
+    });
+    const result = await response.json();
+    await this.setState({ Added_Timesheet: result })
+  }
+  //* --------------------------------------------------------------------------------------- *//
+
   calculateHours(startTime, endTime) {
-    var end = (parseInt(endTime.split(':')[0]) + 12).toString() + ":" + (endTime.split(':')[1]).toString()
-    var start = new Date("1970-01-01T" + startTime + ":00Z");
-    var end = new Date("1970-01-01T" + end + ":00Z");
-    var diff = (end.getTime() + 12) - start.getTime();
-    var hours = Math.floor(diff / (1000 * 60 * 60));
-    var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    var h = (parseInt(hours.toString().padStart(2, "0")) > 12) ? parseInt(hours.toString().padStart(2, "0")) - 12 : parseInt(hours.toString().padStart(2, "0"))
-    return h + ":" + minutes.toString().padStart(2, "0");
+    if (startTime.split(':')[0] != '00') {
+      var end = (parseInt(endTime.split(':')[0]) + 12).toString() + ":" + (endTime.split(':')[1]).toString()
+      var start = new Date("1970-01-01T" + startTime + ":00Z");
+      var end = new Date("1970-01-01T" + end + ":00Z");
+      var diff = (end.getTime() + 12) - start.getTime();
+      var hours = Math.floor(diff / (1000 * 60 * 60));
+      var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      var h = (parseInt(hours.toString().padStart(2, "0")) > 12) ? parseInt(hours.toString().padStart(2, "0")) - 12 : parseInt(hours.toString().padStart(2, "0"))
+      return h + ":" + minutes.toString().padStart(2, "0");
+    }
+    else {
+      return "00:00";
+    }
   }
 
   //* --------------------------------------------------------------------------------------- *//
 
   render() {
-
     return (
       <div>
         <div>
           <Navbar />
         </div>
+        <ToastContainer autoClose={2000} closeOnClick={true} closeButton={<FontAwesomeIcon icon={icon.faXmarkCircle} className="fs-4 mt-2 text-info" />} />
 
         {/*------------------------------------------------------- Card --------------------------------------------------------- */}
         <div className="p-4">
@@ -271,29 +356,53 @@ class Timesheet extends React.Component {
                   type="text"
                   className="form-control"
                   placeholder="Search"
+                  onChange={(e) => this.search(e.target.value)}
 
 
                 />
+
               </div>
             </div>
+            <div className="col-4 pt-5 ">
+              <button
+                type="button"
+                class="btn btn-success"
+
+                data-bs-toggle="dropdown" aria-expanded="false"
+              >
+                <span id="filter_id">Filter</span> &nbsp; <FontAwesomeIcon icon={icon.faFilter} />
+              </button>
+              <div class="dropend">
+                <ul class="dropdown-menu ">
+                  <li className="ps-2 cursor" onClick={(e) => this.filterBy("None")} >None</li>
+                  <li className="ps-2 cursor" onClick={(e) => this.filterBy("Present")} >Present</li>
+                  <li className="ps-2 cursor" onClick={(e) => this.filterBy("Absent")} >Absent</li>
+                  <li className="ps-2 cursor" onClick={(e) => this.filterBy("Week-End")} >Week-End</li>
+                  <li className="ps-2 cursor" onClick={(e) => this.filterBy("Comp-Off")} >Comp-Off</li>
+                  <li className="ps-2 cursor" onClick={(e) => this.filterBy("Public-Holiday")} >Public Holiday</li>
+                </ul>
+              </div>
+            </div>
+
             <div className="col pt-5" align="right">
               <button
                 type="button"
                 class="btn btn-success"
                 data-bs-toggle="modal"
                 data-bs-target="#staticBackdrop1"
+
               >
-                BackUp
+                BackUp &nbsp; <FontAwesomeIcon icon={icon.faUpload} />
               </button>
-              <span> </span>
+
               <button
                 type="button"
-                class="btn btn-primary"
+                class="btn btn-primary m-2"
                 data-bs-toggle="modal"
                 data-bs-target="#staticBackdrop"
 
               >
-                New Timesheet
+                Add &nbsp; <FontAwesomeIcon icon={icon.faCirclePlus} />
               </button>
             </div>
           </div>
@@ -321,7 +430,7 @@ class Timesheet extends React.Component {
                     <th scope="col">{index + 1}</th>
                     <th scope="col">{value.Attendance}</th>
                     <th scope="col">{value.date}</th>
-                    <th scope="col">{value.Activity}</th>
+                    <th scope="col">{value.Activity}</th>  {/*<th scope="col">{value.Attendance == 'Present' ? value.Activity : "-"}</th> */}
                     <th scope="col">{this.calculateHours(value.StartTime, value.Stoptime)}</th>
                   </tr>) : ""}
               </tbody>
@@ -420,7 +529,7 @@ class Timesheet extends React.Component {
                     </div>
                     <input
                       type="time"
-
+                      value={"00:00"}
                       class="form-control"
                       aria-label="Username"
                       aria-describedby="basic-addon1"
@@ -433,7 +542,6 @@ class Timesheet extends React.Component {
                     </div>
                     <input
                       type="time"
-
                       class="form-control"
                       aria-label="Username"
                       aria-describedby="basic-addon1"
@@ -492,23 +600,6 @@ class Timesheet extends React.Component {
                 ></button>
               </div>
               <div class="modal-body ">
-                <div class="input-group flex-nowrap py-4 ">
-                  <span
-                    for="validationDefaultUsername"
-                    class="input-group-text "
-                    id="addon-wrapping"
-                    style={{ paddingInlineEnd: "70px" }}
-                  >
-                    Date
-                  </span>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="backup_date"
-                    name="datefilter"
-                    value=""
-                  />
-                </div>
                 <div class="input-group flex-nowrap  ">
                   <span
                     for="validationDefaultUsername"
@@ -536,6 +627,7 @@ class Timesheet extends React.Component {
             </div>
           </div>
         </div>
+
         {/*---------------------------------------------------- Modal for Submit for approval --------------------------------------*/}
 
         <div
@@ -561,22 +653,6 @@ class Timesheet extends React.Component {
                 ></button>
               </div>
               <div class="modal-body ">
-                <div class="input-group flex-nowrap py-4 ">
-                  <span
-                    for="validationDefaultUsername"
-                    class="input-group-text "
-                    id="addon-wrapping"
-                    style={{ paddingInlineEnd: "70px" }}
-                  >
-                    Date
-                  </span>
-                  <input
-                    type="text"
-                    id="reportrange"
-                    name="datefilter"
-                    value=""
-                  />
-                </div>
                 <div class="input-group flex-nowrap  ">
                   <span
                     for="validationDefaultUsername"
@@ -586,8 +662,9 @@ class Timesheet extends React.Component {
                   >
                     Month
                   </span>
-                  <input type="month" value="" />
+                  <input type="month" className="form-control" id="submit_month" />
                 </div>
+
               </div>
               <div class="modal-footer">
                 <button
@@ -597,8 +674,8 @@ class Timesheet extends React.Component {
                 >
                   Close
                 </button>
-                <button type="button" class="btn btn-primary">
-                  Add
+                <button type="button" class="btn btn-primary" onClick={this.submit_for_approval}>
+                  Submit
                 </button>
               </div>
             </div>

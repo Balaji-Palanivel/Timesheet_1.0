@@ -58,6 +58,9 @@
 }
 
 
+.btn {
+  text-transform: unset !important;
+}
 
 .yhu{
   display: flex;
@@ -66,3 +69,8 @@
   justify-content: center;
  
 }
+
+.cursor{
+  cursor: pointer;
+}
+

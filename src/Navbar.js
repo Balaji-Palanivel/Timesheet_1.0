@@ -3,11 +3,28 @@ import "./App.css";
 import React from "react";
 import { NavLink } from "react-router-dom";
 import Logo from './person_images.png';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import * as icon from "@fortawesome/free-solid-svg-icons";
 
 class Navbar extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+    this.state = {
+      image: Logo
+    }
   }
+
+  componentWillMount() {
+    fetch('http://localhost:5000/navbar')
+      .then((response) => response.json())
+      .then((data) =>
+        this.setState({
+          image: data.image
+        })
+
+      );
+  }
+
   render() {
     return (
       <div className="mb-10">
@@ -67,7 +84,7 @@ class Navbar extends React.Component {
                   </NavLink>
                   <li className="ps-3">
                     <img
-                      src={Logo}
+                      src={this.state.image}
                       alt=""
                       width="50"
                       height="50"
